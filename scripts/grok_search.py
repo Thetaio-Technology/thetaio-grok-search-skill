@@ -7,12 +7,21 @@
 import argparse
 import json
 import os
+import pathlib
 import sys
 import urllib.error
 import urllib.request
 
-DEFAULT_BASE = os.environ.get("THETAIO_BASE_URL", "https://api.thetaio.tech")
+SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
+CONFIG_CANDIDATES = (SCRIPT_DIR / "config.local", SCRIPT_DIR / "config")
+
+DEFAULT_BASE = "https://api.thetaio.tech"
 DEFAULT_MODEL = "grok-4.3"
+NO_KEY_MARKER = "[NO_API_KEY]"
+
+ENV_BASE_KEYS = ("THETAIO_BASE_URL",)
+ENV_KEY_KEYS = ("THETAIO_API_KEY", "THETAIO_KEY")
+ENV_MODEL_KEYS = ("THETAIO_MODEL",)
 
 TOOL_ALIASES = {
     "x": "x_search",
@@ -22,13 +31,59 @@ TOOL_ALIASES = {
 }
 
 
-def resolve_key(cli_key):
-    key = cli_key or os.environ.get("THETAIO_API_KEY") or os.environ.get("THETAIO_KEY")
-    if not key:
+def load_key_value_config(path):
+    if not path.exists():
+        return {}
+    parsed = {}
+    for raw_line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        parsed[key.strip()] = value.split("#", 1)[0].strip()
+    return parsed
+
+
+def find_config_path(explicit=None):
+    if explicit:
+        p = pathlib.Path(explicit).expanduser()
+        if not p.exists():
+            raise RuntimeError(f"config 文件不存在: {p}")
+        return p
+    for candidate in CONFIG_CANDIDATES:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def first_env(keys):
+    for k in keys:
+        v = os.environ.get(k)
+        if v:
+            return v
+    return None
+
+
+def resolve_config(cli_key, cli_base, cli_model, config_path=None):
+    """按优先级返回 (base_url, api_key, model)：
+    CLI 参数 > 环境变量 > scripts/config.local > 默认值。"""
+    path = find_config_path(config_path)
+    file_cfg = load_key_value_config(path) if path else {}
+
+    base_url = (
+        cli_base or first_env(ENV_BASE_KEYS) or file_cfg.get("base_url") or DEFAULT_BASE
+    ).rstrip("/")
+    api_key = cli_key or first_env(ENV_KEY_KEYS) or file_cfg.get("api_key")
+    model = cli_model or first_env(ENV_MODEL_KEYS) or file_cfg.get("model") or DEFAULT_MODEL
+
+    if not api_key:
         sys.exit(
-            "缺少 API Key：请设置环境变量 THETAIO_API_KEY，或用 --api-key 传入。"
+            f"{NO_KEY_MARKER} 未找到 ThetaIO API Key。\n"
+            "请让 agent 运行以下命令完成一次性配置（持久化到 scripts/config.local）：\n"
+            f'  python "{SCRIPT_DIR / "setup.py"}" --api-key "sk-..."\n'
+            "或设置环境变量 THETAIO_API_KEY，或用 --api-key 传入。"
         )
-    return key
+    return base_url, api_key, model
 
 
 def parse_args(argv=None):
@@ -50,9 +105,10 @@ def parse_args(argv=None):
         default="x",
         help="搜索类型：x / x_search（X 站内，默认）或 web / web_search（公开网络）",
     )
-    p.add_argument("--model", default=DEFAULT_MODEL, help=f"模型，默认 {DEFAULT_MODEL}")
-    p.add_argument("--base-url", default=DEFAULT_BASE, help="网关地址")
-    p.add_argument("--api-key", default=None, help="API Key（默认取 THETAIO_API_KEY）")
+    p.add_argument("--model", default=None, help=f"模型，默认 {DEFAULT_MODEL}")
+    p.add_argument("--base-url", default=None, help="网关地址，默认 https://api.thetaio.tech")
+    p.add_argument("--api-key", default=None, help="API Key（默认读取 scripts/config.local）")
+    p.add_argument("--config", default=None, help="可选的 config.local 路径")
     p.add_argument("--stream", action="store_true", help="使用 SSE 流式输出")
     p.add_argument("--show-tools", action="store_true", help="打印每次搜索工具调用（推荐配合 --stream）")
     p.add_argument("--json", action="store_true", help="输出原始 JSON（非流式）")
@@ -187,9 +243,12 @@ def main(argv=None):
     if not kind:
         sys.exit(f"未知 --tool：{args.tool}（可选 x / x_search / web / web_search）")
 
-    key = resolve_key(args.api_key)
+    base_url, key, model = resolve_config(
+        args.api_key, args.base_url, args.model, args.config
+    )
+    args.model = model
     body = build_body(args, kind, args.stream)
-    resp = request(args.base_url, key, body, args.timeout)
+    resp = request(base_url, key, body, args.timeout)
 
     if args.stream:
         result = run_stream(args, resp, kind)

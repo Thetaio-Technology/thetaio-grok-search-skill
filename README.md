@@ -17,13 +17,16 @@
 
 ## 快速开始
 
+密钥**持久化在 skill 内部的 `scripts/config.local`**（已 gitignore，不会上传）。
+
 ```bash
-git clone <repo-url> thetaio-grok-search
+# 1. 检测是否已配置
+python scripts/setup.py --status
 
-# 配置密钥（Windows: set THETAIO_API_KEY=sk-...）
-export THETAIO_API_KEY="sk-..."
+# 2. 未配置则一次性写入密钥
+python scripts/setup.py --api-key "sk-..."
 
-# X 站内搜索
+# 3. 直接搜索（自动读取 config.local）
 python scripts/grok_search.py "latest posts from @elonmusk" --show-tools
 
 # 公开网络搜索
@@ -32,6 +35,8 @@ python scripts/grok_search.py "latest AI news with links" --tool web
 # 流式 + 展示每次工具调用
 python scripts/grok_search.py "what did OpenAI ship this week" --stream --show-tools
 ```
+
+**Agent 工作流**：先 `setup.py --status` 检测 → 缺 Key 时向用户索取并用 `setup.py --api-key` 写入 → 之后每次都直接调用。配置优先级：CLI 参数 > 环境变量 `THETAIO_API_KEY` > `config.local` > 默认值。
 
 ## 安装为 Skill
 
@@ -53,7 +58,8 @@ python scripts/grok_search.py "what did OpenAI ship this week" --stream --show-t
 | `--show-tools` | 打印每次搜索工具调用 |
 | `--json` | 输出原始 JSON |
 | `--base-url` | 网关地址，默认 `https://api.thetaio.tech` |
-| `--api-key` | 直接传 Key（默认读环境变量） |
+| `--api-key` | 直接传 Key（默认读 `config.local`） |
+| `--config` | 自定义 config 文件路径 |
 | `--timeout` | 超时秒数，默认 180 |
 
 ## 重要提示

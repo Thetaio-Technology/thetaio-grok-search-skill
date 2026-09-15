@@ -11,6 +11,8 @@ venv/
 # 环境变量 / 密钥
 .env
 .env.*
+scripts/config.local
+scripts/config
 
 # 编辑器
 .vscode/

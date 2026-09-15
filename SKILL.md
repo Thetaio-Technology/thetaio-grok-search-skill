@@ -15,24 +15,51 @@ compatibility: 需要 Python 3.8+（仅标准库）与网络访问。可选环�
 - 查某话题在 X 或全网的最新动态、舆情、新闻，并要求真实链接
 - 需要"搜索结果 + 信源链接"的场景；不要用于纯对话或离线知识问题
 
-## 前置条件
+## 密钥与配置（agent 必读）
 
-- 密钥：环境变量 `THETAIO_API_KEY`（或 `THETAIO_KEY`）。缺失时脚本会报错提示。
-- 网关：默认 `https://api.thetaio.tech`，可用 `THETAIO_BASE_URL` 覆盖。
-- 模型：默认 `grok-4.3`（**唯一推荐**）。不要用 `grok-4.5`，它两个搜索工具都会 400。
+密钥**持久化在 skill 内部的 `scripts/config.local`**，由 agent 负责检测与安装。`config.local` 已被 `.gitignore` 忽略，**不会上传到 GitHub**。
 
-## 安装
+**agent 必须遵循的流程（先检测 → 没有则装 → 然后直接调用）：**
 
-```bash
-git clone <repo-url> thetaio-grok-search
-export THETAIO_API_KEY="sk-..."     # Windows: set THETAIO_API_KEY=sk-...
-```
+1. **检测**：运行
+   ```bash
+   python scripts/setup.py --status
+   ```
+   若输出"未配置"，进入第 2 步；若已配置，直接跳到第 3 步。
 
-把本目录放到客户端的 skills 目录（如 `~/.config/opencode/skills/` 或 `~/.claude/skills/`）即可被自动发现。
+2. **安装（仅当缺失时）**：向用户索取 ThetaIO API Key，然后写入配置：
+   ```bash
+   python scripts/setup.py --api-key "sk-..."
+   ```
+   该脚本幂等：已有配置会跳过，不会覆盖；需要修改用 `--force`。可选 `--base-url`、`--model`。
+
+3. **调用**：直接运行 `grok_search.py`，它会自动读取 `config.local`：
+   ```bash
+   python scripts/grok_search.py "latest posts from @elonmusk" --show-tools
+   ```
+
+**配置优先级**：`--api-key` / CLI 参数 > 环境变量（`THETAIO_API_KEY` / `THETAIO_KEY`）> `scripts/config.local` > 默认值。
+
+**注意**：
+- 缺 Key 时 `grok_search.py` 会返回带 `[NO_API_KEY]` 标记的错误。看到它**不要**把技术报错原样抛给用户，而是按上面第 2 步引导用户提供 Key，拿到后立即完成原本的搜索需求。
+- 不要把 Key 写进源文件、提示词、日志或回复，也不要贴到公开渠道。
+- 也可以不安装，直接用环境变量或 `--api-key` 临时传入，此时不落盘。
+
+默认值：网关 `https://api.thetaio.tech`，模型 `grok-4.3`（**唯一推荐**）。不要用 `grok-4.5`，它两个搜索工具都会 400。
+
+## 安装到客户端
+
+把本目录放到客户端的 skills 目录（如 `~/.config/opencode/skills/` 或 `~/.claude/skills/`）即可被自动发现。密钥首次使用前按上面的流程安装一次。
 
 ## 用法
 
 ```bash
+# 查看配置状态
+python scripts/setup.py --status
+
+# 一次性写入密钥（持久化，agent 会自动做）
+python scripts/setup.py --api-key "sk-..."
+
 # X 站内搜索（默认）
 python scripts/grok_search.py "latest posts from @elonmusk" --show-tools
 
