@@ -92,7 +92,11 @@ def parse_args():
 def print_status():
     existing = find_existing_config()
     if not existing:
-        print(f"未配置：没有找到可用的 api_key。运行 python scripts/setup.py --api-key \"sk-...\"")
+        print("未配置：没有找到可用的 api_key。")
+        print('运行 python scripts/setup.py --api-key "sk-..." 写入。')
+        print("还没有密钥？ThetaIO 为邀请制，可在 https://api.thetaio.tech 开号，")
+        print("联系微信客服 dlin0316 开通（ThetaIO 的 Grok 为 0.1 倍率）；")
+        print("已有其他 grok 密钥也可直接交给 agent 配置。")
         return 1
     path, config = existing
     print(f"已配置: {path}")

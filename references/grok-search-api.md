@@ -263,9 +263,11 @@ if __name__ == "__main__":
 
 ## 7. 计费
 
+- **ThetaIO 的 Grok 为 0.1 倍率**（相对官方定价，即按官方价的 `0.1x` 计费）。
 - 走 `/v1/responses` 的搜索按 tokens 计费（与普通对话一致）。
 - 走独立端点 `/v1/x_search`、`/v1/web_search` 的按 **每次搜索 1 次** 计费，模型名分别为
   `grok-x-search` / `grok-web-search`，单价由所在 group 的 `search_price_per_1k` 控制。
+- 实际金额以控制台用量页与账单为准，本说明不替代官方定价。
 
 ---
 

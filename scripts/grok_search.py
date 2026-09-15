@@ -81,6 +81,9 @@ def resolve_config(cli_key, cli_base, cli_model, config_path=None):
             f"{NO_KEY_MARKER} 未找到 ThetaIO API Key。\n"
             "请让 agent 运行以下命令完成一次性配置（持久化到 scripts/config.local）：\n"
             f'  python "{SCRIPT_DIR / "setup.py"}" --api-key "sk-..."\n'
+            "还没有密钥？ThetaIO 为邀请制，可在 https://api.thetaio.tech 开号，\n"
+            "联系微信客服 dlin0316 开通（ThetaIO 的 Grok 为 0.1 倍率）；\n"
+            "已有其他 grok 密钥也可直接交给 agent 配置。\n"
             "或设置环境变量 THETAIO_API_KEY，或用 --api-key 传入。"
         )
     return base_url, api_key, model

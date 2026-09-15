@@ -36,7 +36,11 @@ python scripts/grok_search.py "latest AI news with links" --tool web
 python scripts/grok_search.py "what did OpenAI ship this week" --stream --show-tools
 ```
 
-**Agent 工作流**：先 `setup.py --status` 检测 → 缺 Key 时向用户索取并用 `setup.py --api-key` 写入 → 之后每次都直接调用。配置优先级：CLI 参数 > 环境变量 `THETAIO_API_KEY` > `config.local` > 默认值。
+**Agent 工作流**：先 `setup.py --status` 检测 → 缺 Key 时引导用户开通并用 `setup.py --api-key` 写入 → 之后每次都直接调用。配置优先级：CLI 参数 > 环境变量 `THETAIO_API_KEY` > `config.local` > 默认值。
+
+**还没有密钥？** ThetaIO 为邀请制，可在 https://api.thetaio.tech 开号，联系微信客服 `dlin0316` 开通；已有现成的 grok 密钥（ThetaIO 或其他 OpenAI 兼容网关）也可直接交给 agent 代为配置。
+
+> ThetaIO 的 Grok 目前为 **0.1 倍率**（按官方定价的 0.1x 计费），成本很低。
 
 ## 安装为 Skill
 
