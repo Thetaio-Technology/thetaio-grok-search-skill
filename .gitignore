@@ -2,6 +2,9 @@
 conversations/
 *.log
 
+# 生图中间产物（原始输出，可依据 prompts/ 重新生成）
+assets/raw/
+
 # Python
 __pycache__/
 *.py[cod]
