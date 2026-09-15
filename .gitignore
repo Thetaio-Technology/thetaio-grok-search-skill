@@ -1,0 +1,19 @@
+# 会话/日志等本地文件
+conversations/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 环境变量 / 密钥
+.env
+.env.*
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
