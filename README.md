@@ -6,6 +6,8 @@
 
 基于 ThetaIO 网关（`https://api.thetaio.tech`）的 `POST /v1/responses` + server-side `x_search` / `web_search` 工具。
 
+> **一行安装（推荐）**：把这个 GitHub 项目链接直接发给你的 agent（opencode / Claude Code 等），告诉它"帮我安装并配置这个 skill"，agent 会自行完成克隆、放入 skills 目录、检测密钥并按需引导你开号。
+
 ## 特性
 
 - **X 站内搜索**：查某人最近发了什么、某话题在 X 上怎么讨论
@@ -44,7 +46,9 @@ python scripts/grok_search.py "what did OpenAI ship this week" --stream --show-t
 
 ## 安装为 Skill
 
-把本目录复制到客户端的 skills 目录：
+最简单的方式：**把这个仓库链接发给你的 agent**（opencode / Claude Code 等），让它帮你安装。它会克隆仓库、把目录放到正确的 skills 位置，并运行 `scripts/setup.py --status` 检测密钥；若还没有密钥，会引导你开号或让你把现成的密钥交给它配置。
+
+也可以手动安装，把本目录复制到客户端的 skills 目录：
 
 - opencode：`~/.config/opencode/skills/thetaio-grok-search/`
 - Claude Code：`~/.claude/skills/thetaio-grok-search/`
