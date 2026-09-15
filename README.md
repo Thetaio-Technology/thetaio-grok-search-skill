@@ -6,8 +6,6 @@
 
 基于 ThetaIO 网关（`https://api.thetaio.tech`）的 `POST /v1/responses` + server-side `x_search` / `web_search` 工具。
 
-![请求管线](assets/pipeline.png)
-
 ## 特性
 
 - **X 站内搜索**：查某人最近发了什么、某话题在 X 上怎么讨论
@@ -58,23 +56,12 @@ python scripts/grok_search.py "what did OpenAI ship this week" --stream --show-t
 | `--api-key` | 直接传 Key（默认读环境变量） |
 | `--timeout` | 超时秒数，默认 180 |
 
-## 两种搜索工具
-
-![两种搜索工具](assets/mono-dark.png)
-
 ## 重要提示
 
 - 结果是否可信，看 `usage.server_side_tool_usage_details.{x,web}_search_calls` 是否 `> 0`。
-
-![运行状态](assets/status.png)
-
 - 信源在 `output[].content[].annotations[].url_citation.url`，不在 `results` 字段。
 - 独立端点 `/v1/x_search`、`/v1/web_search` 仅 `grok` 平台 Key 可用（`openai` 平台返回 404）；本 skill 统一走 `/v1/responses`。
 - 完整 API 文档见 [`references/grok-search-api.md`](references/grok-search-api.md)。
-
-## 视觉素材
-
-`assets/` 下的 README 配图遵循 [ThetaIO 设计系统]（近黑/纸张灰单色、细边框、基础设施线路图、鼠尾草绿仅用于可信状态），由 ThetaIO 生图 skill 生成。规划与提示词见 `assets/brief.md`、`assets/style-plan.md`、`assets/prompts/`。
 
 ## License
 
