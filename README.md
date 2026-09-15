@@ -10,7 +10,7 @@
 
 ## 核心能力
 
-- **X 站内搜索**：查某人最近发了什么帖子或回复，某话题在 X 上如何讨论。
+- **X 站内搜索**：查某人（如 OpenAI 负责人 Tibo Sottiaux `@thsottiaux`）最近发了什么帖子或回复，某话题在 X 上如何讨论。
 - **公开网络搜索**：检索全网最新资讯、舆情与新闻。
 - **原始信源**：自动提取 `output[].content[].annotations[].url_citation.url`，交付时可验证的链接。
 - **真实性校验**：读取 `usage.server_side_tool_usage_details`，`0` 次工具调用时明确告警，避免采信模型编造的内容。
@@ -54,8 +54,8 @@ python scripts/setup.py --api-key "sk-..."
 ### 4. 最小可运行示例
 
 ```bash
-# X 站内搜索（默认）
-python scripts/grok_search.py "latest posts from @elonmusk" --show-tools
+# X 站内搜索（默认）：查 OpenAI 负责人 Tibo Sottiaux 最近的帖子
+python scripts/grok_search.py "latest posts from @thsottiaux" --show-tools
 
 # 公开网络搜索
 python scripts/grok_search.py "latest AI news with links" --tool web

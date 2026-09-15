@@ -96,10 +96,10 @@ def parse_args(argv=None):
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "示例:\n"
-            "  grok_search.py \"latest posts from @elonmusk\"\n"
+            "  grok_search.py \"latest posts from @thsottiaux\"   # OpenAI 负责人 Tibo\n"
             "  grok_search.py \"latest AI news\" --tool web\n"
             "  grok_search.py \"what did OpenAI ship this week\" --stream --show-tools\n"
-            "  grok_search.py \"posts from @thsottiaux\" --json\n"
+            "  grok_search.py \"posts from @elonmusk\" --json\n"
         ),
     )
     p.add_argument("query", help="自然语言查询或搜索指令")
